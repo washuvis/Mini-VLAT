@@ -1,0 +1,161 @@
+{
+  "children": [
+    {
+      "name": "Search/Portal",
+      "children": [
+        {
+          "name": "Google",
+          "group": "A",
+          "value": 349758716,
+          "colname": "level3"
+        },
+        {
+          "name": "MSN/WindowsLive/Bing",
+          "group": "A",
+          "value": 271929865,
+          "colname": "level3"
+        },
+        {
+          "name": "Yahoo!",
+          "group": "C",
+          "value": 233479611,
+          "colname": "level3"
+        },
+        {
+          "name": "Ask",
+          "group": "C",
+          "value": 220410208,
+          "colname": "level3"
+        }
+      ],
+      "colname": "level2"
+    },
+    {
+      "name": "Social Network",
+      "children": [
+        {
+          "name": "Facebook",
+          "group": "C",
+          "value": 218860914,
+          "colname": "level3"
+        },
+        {
+          "name": "Twitter",
+          "group": "A",
+          "value": 42138681,
+          "colname": "level3"
+        },
+        {
+          "name": "Orkut",
+          "group": "B",
+          "value": 28419073,
+          "colname": "level3"
+        },
+        {
+          "name": "LinkedIn",
+          "group": "B",
+          "value": 24389451,
+          "colname": "level3"
+        }
+      ],
+      "colname": "level2"
+    },
+    {
+      "name": "Software",
+      "children": [
+        {
+          "name": "Mozilla",
+          "group": "B",
+          "value": 67949332,
+          "colname": "level3"
+        },
+        {
+          "name": "Real Network",
+          "group": "A",
+          "value": 61513698,
+          "colname": "level3"
+        },
+        {
+          "name": "Adobe",
+          "group": "A",
+          "value": 53002496,
+          "colname": "level3"
+        },
+        {
+          "name": "Videolan",
+          "group": "D",
+          "value": 24850138,
+          "colname": "level3"
+        },
+        {
+          "name": "Conduit",
+          "group": "D",
+          "value": 20610183,
+          "colname": "level3"
+        }
+      ],
+      "colname": "level2"
+    },
+    {
+      "name": "Retail",
+      "children": [
+        {
+          "name": "eBay",
+          "group": "B",
+          "value": 121740943,
+          "colname": "level3"
+        },
+        {
+          "name": "Amazon",
+          "group": "A",
+          "value": 111945278,
+          "colname": "level3"
+        },
+        {
+          "name": "Wal-Mart",
+          "group": "A",
+          "value": 35538645,
+          "colname": "level3"
+        },
+        {
+          "name": "Craigslist",
+          "group": "D",
+          "value": 35537183,
+          "colname": "level3"
+        },
+        {
+          "name": "Target",
+          "group": "D",
+          "value": 23366341,
+          "colname": "level3"
+        }
+      ],
+      "colname": "level2"
+    },
+    {
+      "name": "Computer",
+      "children": [
+        {
+          "name": "Apple",
+          "group": "B",
+          "value": 119232527,
+          "colname": "level3"
+        },
+        {
+          "name": "Dell",
+          "group": "A",
+          "value": 23324607,
+          "colname": "level3"
+        },
+        {
+          "name": "HP",
+          "group": "A",
+          "value": 20721035,
+          "colname": "level3"
+        }
+      ],
+      "colname": "level2"
+    }
+  ],
+  "name": "CEO"
+}

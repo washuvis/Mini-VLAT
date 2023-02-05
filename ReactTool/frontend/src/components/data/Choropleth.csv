@@ -1,0 +1,52 @@
+﻿state,value,code,id
+Nebraska,4.2,NE,31
+South Dakota,4.6,SD,46
+Utah,4.7,UT,49
+North Dakota,5.1,ND,38
+Iowa,5.3,IA,19
+Idaho,5.4,ID,16
+Maine,5.4,ME,23
+Vermont,5.6,VT,50
+Wyoming,5.8,WY,56
+Alabama,5.9,AL,01
+Kansas,5.9,KS,20
+Montana,5.9,MT,30
+Arkansas,6.1,AR,05
+Missouri,6.1,MO,29
+Oklahoma,6.1,OK,40
+Minnesota,6.2,MN,27
+South Carolina,6.2,SC,45
+Virginia,6.2,VA,51
+Wisconsin,6.3,WI,55
+Georgia,6.5,GA,13
+Kentucky,6.6,KY,21
+New Hampshire,6.7,NH,33
+Maryland,6.8,MD,24
+Indiana,7.1,IN,18
+Colorado,7.3,CO,08
+North Carolina,7.3,NC,37
+Tennessee,7.5,TN,47
+Oregon,7.6,OR,41
+Texas,7.6,TX,48
+Florida,7.7,FL,12
+Alaska,7.8,AK,02
+Delaware,7.8,DE,10
+Arizona,7.9,AZ,04
+Connecticut,7.9,CT,09
+District of Columbia,8,DC,11
+Mississippi,8.1,MS,28
+Ohio,8.1,OH,39
+Louisiana,8.3,LA,22
+West Virginia,8.3,WV,54
+New Mexico,8.4,NM,35
+Washington,8.4,WA,53
+Massachusetts,8.9,MA,25
+Pennsylvania,9.1,PN,42
+Rhode Island,9.4,RI,44
+Illinois,9.5,IL,17
+New Jersey,9.8,NJ,34
+Michigan,9.9,MI,26
+New York,10,NY,36
+California,10.1,CA,06
+Hawaii,11.6,HI,15
+Nevada,12.8,NV,32
