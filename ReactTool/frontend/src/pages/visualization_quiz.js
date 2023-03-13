@@ -184,7 +184,7 @@ class VisQuiz extends Component {
             })
 
         var pageType = {
-            pathname: '/score',
+            pathname: '/thank_you',
             state: {
                 data: {
                     'session_id': this.state.session_id,
