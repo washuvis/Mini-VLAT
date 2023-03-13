@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Col, Row, Button, InputGroup, FormControl} from 'react-bootstrap';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
+import {score_2} from './visualization_quiz';
 
 class ThankYou extends Component {
 
@@ -32,7 +33,7 @@ class ThankYou extends Component {
         return (
             <Row className={'justify-content-center no-margin-row'}>
                 <Col lg={6} className={'text-box text-justify'}>
-                    <p>Thank you for participating in our study. You responses have been recorded.</p>
+                    <h3>You scored {score_2} out of 12. Thank you for participating in our study. Your responses have been recorded.</h3>
 
 
                     {/*
