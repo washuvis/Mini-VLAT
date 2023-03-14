@@ -33,32 +33,27 @@ import img12 from '../components/data/VLAT-Pics/LineChart.png'
 
 
 let minivis = [
-    { 'vis': BarChartMini, 'type': 'BarChart', 'question': 'What is the average internet speed in Japan?', 'options': ["42.30 Mbps", "40.51 Mbps", "35.25 Mbps", "16.16 Mbps", "Skip"], 'correct_answer': 1, 'cimage': img9 },
-    { 'vis': AreaChartMini, 'type': 'AreaChart', 'question': 'What was the average price of pount of coffee beans in October 2019?', 'options': ["$0.71", "$0.90", "$0.80", "$0.63", "Skip"], 'correct_answer': 0, 'cimage': img10 },
-    { 'vis': BubbleChartMini, 'type': 'BubbleChart', 'question': 'Which city\'s metro system has the largest number of stations?', 'options': ['Beijing', 'Shanghai', 'London', 'Seoul', "Skip"], 'correct_answer': 1, 'cimage': img3 },
+    { 'vis': BarChartMini, 'type': 'Bar Chart', 'question': 'What is the average internet speed in Japan?', 'options': ["42.30 Mbps", "40.51 Mbps", "35.25 Mbps", "16.16 Mbps", "Skip"], 'correct_answer': 1, 'cimage': img9 },
+    { 'vis': AreaChartMini, 'type': 'Area Chart', 'question': 'What was the average price of pount of coffee beans in October 2019?', 'options': ["$0.71", "$0.90", "$0.80", "$0.63", "Skip"], 'correct_answer': 0, 'cimage': img10 },
+    { 'vis': BubbleChartMini, 'type': 'Bubble Chart', 'question': 'Which city\'s metro system has the largest number of stations?', 'options': ['Beijing', 'Shanghai', 'London', 'Seoul', "Skip"], 'correct_answer': 1, 'cimage': img3 },
     { 'vis': ChoroplethMini, 'type': 'Choropleth', 'question': 'In 2020, the unemployment rate for Washington (WA) was higher than that of Wisconsin (WI).', 'options': ['True', 'False', "Skip"], 'correct_answer': 0, 'cimage': img8 },
     { 'vis': HistogramMini, 'type': 'Histogram', 'question': 'What distance have customers traveled in the taxi the most?', 'options': ["60 - 70 Km", "30 - 40 Km", "20 - 30 Km", "50 - 60 Km", "Skip"], 'correct_answer': 1, 'cimage': img6 },
-    { 'vis': LineChartMini, 'type': 'LineChart', 'question': 'What was the price of a barrel of oil in February 2020?', 'options': ["$50.54", "$47.02", "$42.34", "$42.34", "Skip"], 'correct_answer': 0, 'cimage': img12 },
-    { 'vis': TreeMapMini, 'type': 'TreeMap', 'question': 'eBay is nested in the Software category.', 'options': ['True', 'False', 'Skip'], 'correct_answer': 1, 'cimage': img4 },
-    { 'vis': ScatterPlotMini, 'type': 'ScatterPlot', 'question': 'There is a negative linear relationship between the height and the weight of the 85 males.', 'options': ['True', 'False', 'Skip'], 'correct_answer': 1, 'cimage': img1 },
-    { 'vis': StackedBarChartMini, 'type': 'StackedBarChart', 'question': 'Which country has the lowest proportion of Gold medals?', 'options': ["Great Britain", "U.S.A.", "Japan", "Australia", 'Skip'], 'correct_answer': 0, 'cimage': img5 },
-    { 'vis': StackedAreaPlotMini, 'type': 'StackedAreaPlot', 'question': 'What was the ratio of girls named \'Isla\' to girls named \'Amelia\' in 2012 in the UK?', 'options': ["1 to 1", "1 to 2", "1 to 3", "1 to 4", "Skip"], 'correct_answer': 1, 'cimage': img7 },
-    { 'vis': StackedBarChart2Mini, 'type': 'StackedBarChart2', 'question': 'What is the cost of peanuts in Seoul?', 'options': ["$6.1", "$5.2", "$7.5", "$4.5", "Skip"], 'correct_answer': 0, 'cimage': img2 },
-    { 'vis': PieChartMini, 'type': 'PieChart', 'question': 'What is the approximate global smartphone market share of Samsung?', 'options': ["17.6%", "25.3%", "10.9%", "35.2%", 'Skip'], 'correct_answer': 0, 'cimage': img11 }
+    { 'vis': LineChartMini, 'type': 'Line Chart', 'question': 'What was the price of a barrel of oil in February 2020?', 'options': ["$50.54", "$47.02", "$42.34", "$42.34", "Skip"], 'correct_answer': 0, 'cimage': img12 },
+    { 'vis': TreeMapMini, 'type': 'Treemap', 'question': 'eBay is nested in the Software category.', 'options': ['True', 'False', 'Skip'], 'correct_answer': 1, 'cimage': img4 },
+    { 'vis': ScatterPlotMini, 'type': 'Scatterplot', 'question': 'There is a negative linear relationship between the height and the weight of the 85 males.', 'options': ['True', 'False', 'Skip'], 'correct_answer': 1, 'cimage': img1 },
+    { 'vis': StackedBarChartMini, 'type': '100% Stacked Bar', 'question': 'Which country has the lowest proportion of Gold medals?', 'options': ["Great Britain", "U.S.A.", "Japan", "Australia", 'Skip'], 'correct_answer': 0, 'cimage': img5 },
+    { 'vis': StackedAreaPlotMini, 'type': 'Stacked Area', 'question': 'What was the ratio of girls named \'Isla\' to girls named \'Amelia\' in 2012 in the UK?', 'options': ["1 to 1", "1 to 2", "1 to 3", "1 to 4", "Skip"], 'correct_answer': 1, 'cimage': img7 },
+    { 'vis': StackedBarChart2Mini, 'type': 'Stacked Bar', 'question': 'What is the cost of peanuts in Seoul?', 'options': ["$6.1", "$5.2", "$7.5", "$4.5", "Skip"], 'correct_answer': 0, 'cimage': img2 },
+    { 'vis': PieChartMini, 'type': 'Pie Chart', 'question': 'What is the approximate global smartphone market share of Samsung?', 'options': ["17.6%", "25.3%", "10.9%", "35.2%", 'Skip'], 'correct_answer': 0, 'cimage': img11 }
 ];
 
+var record_ques = {}
 
-
-var score_1 = 0
 var score_2 = 0
 let initTime = 0
 let endTime = 0
 var num = 12
-//var correct_collec = []
-//var wrong_collec = []
-var correct_collect = []
-var wrong_collect = []
-var random_list = [0, 1]
+
 
 class VisQuiz extends Component {
 
@@ -135,6 +130,14 @@ class VisQuiz extends Component {
             device_info: navigator.userAgent
         })
         score_2 = this.state.mini_score
+
+        if (response === minivis[this.state.current_mini_index]['options'][truth]) {
+            record_ques[type] = 'Correct'
+        }
+        else {
+            record_ques[type] = 'Wrong'
+        }
+        console.log("The dictionary is: ", record_ques)
     }
 
 
@@ -208,15 +211,9 @@ class VisQuiz extends Component {
             current_mini_index: this.state.current_mini_index + 1,
         })
     }
-    randomChoose() {
-        return random_list[Math.floor(Math.random() * random_list.length)]
-    }
 
 
     render() {
-        //console.log("Random number is ", this.randomChoose())
-        //const { refCallback, time } = this.props;
-        console.log("Random array is ", this.randomChoose())
         const hoursMinSecs = { hours: 0, minutes: 0, seconds: 10 }
         initTime = Date.now()
         console.log("Starting Time is : " + initTime)
@@ -236,10 +233,7 @@ class VisQuiz extends Component {
         }
         if (this.state.current_mini_index < this.state.list_of_min_vis.length) {
             const options = minivis[this.state.current_mini_index]['options'].map((item, i) =>
-                // <Button variant="secondary" size="sm" className={'question-option'} id={`button_option_${i}`} key={`button_option_${i}`} onClick={() =>
-                //     /this.clicked_answer(minivis[this.state.current_mini_index]['type'], minivis[this.state.current_mini_index]['question'], item, minivis[this.state.current_mini_index]['correct_answer'], "timeTaken", minivis[this.state.current_mini_index]['cimage'])}>
-                //     {item}
-                // </Button>
+
                 <Button variant="secondary" size="sm" className={'question-option'} id={`button_option_${i}`} key={`button_option_${i}`} onClick={() =>
                     this.clicked_mini_answer(minivis[this.state.current_mini_index]['type'], minivis[this.state.current_mini_index]['question'], item, minivis[this.state.current_mini_index]['correct_answer'], 'timeTaken')}>
                     {item}
@@ -373,7 +367,5 @@ class VisQuiz extends Component {
 
 
 export default VisQuiz;
-export { correct_collect };
-export { wrong_collect };
-export { score_1 };
 export { score_2 };
+export { record_ques };

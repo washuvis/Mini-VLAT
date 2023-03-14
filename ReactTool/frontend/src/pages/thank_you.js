@@ -1,7 +1,8 @@
-import React, {Component} from 'react';
-import {Col, Row, Button, InputGroup, FormControl} from 'react-bootstrap';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
-import {score_2} from './visualization_quiz';
+import React, { Component } from 'react';
+import { Col, Row, Button, InputGroup, FormControl } from 'react-bootstrap';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { score_2 } from './visualization_quiz';
+import { record_ques } from './visualization_quiz';
 
 class ThankYou extends Component {
 
@@ -18,9 +19,33 @@ class ThankYou extends Component {
             })
         }
     }
+    renderTable() {
+        return (
+            <table style={{ borderCollapse: 'collapse', margin: 'auto' }}>
+                <thead>
+                    <tr>
+                        <th style={{ border: '1px solid black', padding: '5px' }}>Question</th>
+                        <th style={{ border: '1px solid black', padding: '5px' }}>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {Object.entries(record_ques).map(([question, answer]) => (
+                        <tr key={question}>
+                            <td style={{ border: '1px solid black', padding: '5px' }}>{question}</td>
+                            <td style={{ border: '1px solid black', padding: '5px' }}>
+                                {answer === 'Correct' ? <span>&#10004;</span> : answer === 'Wrong' ? <span>&#10060;</span> : answer}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        );
+    }
 
     render() {
         console.log('attempting to render')
+        console.log("The keys of the dictionary is: " + Object.keys(record_ques))
+        console.log("The values of the dictionary is: " + Object.values(record_ques))
 
         if (this.props.location.state == null) {
             return (<p>Unknown session. Please start from the <a href={'#/'}> consent page</a></p>)
@@ -33,30 +58,9 @@ class ThankYou extends Component {
         return (
             <Row className={'justify-content-center no-margin-row'}>
                 <Col lg={6} className={'text-box text-justify'}>
-                    <h3>You scored {score_2} out of 12. Thank you for participating in our study. Your responses have been recorded.</h3>
-
-
-                    {/*
-                    <InputGroup size='lg' className="mb-3">
-                        <FormControl
-                            placeholder="session_id"
-                            aria-label="session_id"
-                            aria-describedby="Session Code"
-                            value={this.state.value}
-
-                        />
-
-                        <CopyToClipboard text={this.state.value}
-                                         onCopy={() => this.setState({copied: true})}>
-                            <Button
-                                variant="outline-secondary">{this.state.copied ? <>Copied!</> : <>Copy</>}</Button>
-                        </CopyToClipboard>
-
-                    </InputGroup> */}
-
-
+                    <h3 style={{ marginBottom: '20px' }}>You scored {score_2} out of 12. Thank you for participating in our study. Your responses have been recorded.</h3>
+                    {this.renderTable()}
                 </Col>
-
             </Row>
 
         );
