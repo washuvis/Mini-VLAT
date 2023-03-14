@@ -16,6 +16,7 @@ import StackedBarChartMini from "../components/stacked100bar-mini";
 import StackedAreaPlotMini from "../components/stackedArea-mini";
 import StackedBarChart2Mini from "../components/stackedbar-mini";
 import TreeMapMini from "../components/treeMap-mini";
+import axios from 'axios';
 
 import img1 from '../components/data/VLAT-Pics/Scatterplot.png'
 import img2 from '../components/data/VLAT-Pics/StackedBar.png'
@@ -84,6 +85,7 @@ class VisQuiz extends Component {
             width: 0,
             height: 0,
             mini_score: 0,
+            ip_address: "",
         }
         )
 
@@ -116,8 +118,17 @@ class VisQuiz extends Component {
 
         this.setState({ demographic_questions: new_dq, demographics_incomplete: incomplete })
     }
+    getData = async () => {
+        //https://medium.com/how-to-react/how-to-get-user-ip-address-in-react-js-73eb295720d0
+        const res = await axios.get('https://geolocation-db.com/json/')
+        console.log("IP Address:  ", res.data);
+        this.setState({
+            ip_address: res.data.IPv4
+        })
+    }
 
     clicked_mini_answer(type, question, response, truth, time) {
+        this.getData()
         if (response === minivis[this.state.current_mini_index]['options'][truth]) {
             this.state.mini_score = this.state.mini_score + 1
         }
@@ -177,7 +188,8 @@ class VisQuiz extends Component {
                 demographic_responses: this.state.demographic_questions,
                 comment: this.state.comment,
                 height: window.innerHeight,
-                width: window.innerWidth
+                width: window.innerWidth,
+                ipaddress: this.state.ip_address
             })
         })
             .then(res => res.json()).then(data => {
