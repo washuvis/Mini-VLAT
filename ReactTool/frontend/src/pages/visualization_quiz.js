@@ -145,6 +145,9 @@ class VisQuiz extends Component {
         if (response === minivis[this.state.current_mini_index]['options'][truth]) {
             record_ques[type] = 'Correct'
         }
+        else if (response === 'Skip') {
+            record_ques[type] = 'Skip'
+        }
         else {
             record_ques[type] = 'Wrong'
         }
