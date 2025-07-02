@@ -18,18 +18,18 @@ import StackedBarChart2Mini from "../components/stackedbar-mini";
 import TreeMapMini from "../components/treeMap-mini";
 import axios from 'axios';
 
-import img1 from '../components/data/VLAT-Pics/Scatterplot.png'
-import img2 from '../components/data/VLAT-Pics/StackedBar.png'
-import img3 from '../components/data/VLAT-Pics/BubbleChart.png'
-import img4 from '../components/data/VLAT-Pics/TreeMap.png'
-import img5 from '../components/data/VLAT-Pics/StackedBar100.png'
-import img6 from '../components/data/VLAT-Pics/Histogram.png'
-import img7 from '../components/data/VLAT-Pics/StackedArea.png'
-import img8 from '../components/data/VLAT-Pics/Choropleth.png'
-import img9 from '../components/data/VLAT-Pics/BarGraph.png'
-import img10 from '../components/data/VLAT-Pics/AreaChart.png'
-import img11 from '../components/data/VLAT-Pics/Pie.png'
-import img12 from '../components/data/VLAT-Pics/LineChart.png'
+import img1 from '../components/data/Vis_Pics/scatterplot.png'
+import img2 from '../components/data/Vis_Pics/stackedbar.png'
+import img3 from '../components/data/Vis_Pics/bubble.png'
+import img4 from '../components/data/Vis_Pics/treemap.png'
+import img5 from '../components/data/Vis_Pics/100stackedbar.png'
+import img6 from '../components/data/Vis_Pics/histogram.png'
+import img7 from '../components/data/Vis_Pics/stackedarea.png'
+import img8 from '../components/data/Vis_Pics/map.png'
+import img9 from '../components/data/Vis_Pics/bar.png'
+import img10 from '../components/data/Vis_Pics/area.png'
+import img11 from '../components/data/Vis_Pics/pie.png'
+import img12 from '../components/data/Vis_Pics/line.png'
 
 
 
@@ -47,6 +47,7 @@ let minivis = [
     { 'vis': StackedBarChart2Mini, 'type': 'Stacked Bar', 'question': 'What is the cost of peanuts in Seoul?', 'options': ["$6.1", "$5.2", "$7.5", "$4.5", "Skip"], 'correct_answer': 0, 'cimage': img2 },
     { 'vis': PieChartMini, 'type': 'Pie Chart', 'question': 'What is the approximate global smartphone market share of Samsung?', 'options': ["17.6%", "25.3%", "10.9%", "35.2%", 'Skip'], 'correct_answer': 0, 'cimage': img11 }
 ];
+export { minivis };
 
 var record_ques = {}
 
@@ -56,14 +57,61 @@ let endTime = 0
 var num = 12
 
 
+// Demographic fields and helpers
+const demographicFields = [
+    { id: 'age', label: 'Please select your age.', type: 'select', options: Array.from({ length: 82 }, (_, i) => (i + 18).toString()) },
+    { id: 'sex', label: 'Please select your gender.', type: 'select', options: [
+        { value: 'male', label: 'Male' },
+        { value: 'female', label: 'Female' },
+        { value: 'other', label: 'Other' },
+        { value: 'withdraw', label: 'I do not wish to disclose.' }
+    ] },
+    { id: 'education', label: 'Please select your highest level of completed education.', type: 'select', options: [
+        { value: 'highschool', label: 'High School Diploma / GED' },
+        { value: 'associate', label: 'Associate Degree' },
+        { value: 'bachelors', label: 'Bachelors Degree' },
+        { value: 'masters', label: 'Masters Degree' },
+        { value: 'doctorate', label: 'Doctorate Degree' }
+    ] },
+    { id: 'color-blind', label: 'Are you color-blind?', type: 'select', options: [
+        { value: 'no', label: 'No' },
+        { value: 'yes', label: 'Yes' },
+        { value: 'maybe', label: 'I do not wish to disclose.' }
+    ] },
+    { id: 'color-blind-type', label: 'If yes, what kind of color-blindness?', type: 'select', options: [
+        { value: 'red-green', label: 'Red-Green' },
+        { value: 'blue-yellow', label: 'Blue-Yellow' },
+        { value: 'total', label: 'Total' },
+        { value: 'other', label: 'Other' }
+    ], dependsOn: { field: 'color-blind', value: 'yes' } },
+    { id: 'country', label: 'What country are you from?', type: 'text' },
+    { id: 'native-language', label: 'What is your native language?', type: 'text' },
+    { id: 'familiarity', label: 'Please select your familiarity with visualization.', type: 'select', options: [
+        { value: 'not_familiar', label: 'I have never created a visualization.' },
+        { value: 'somewhat', label: 'I am somewhat familiar.' },
+        { value: 'very_familiar', label: 'I have created visualization systems before.' }
+    ] }
+];
+
+function getInitialDemographicState() {
+    return {
+        age: '',
+        sex: '',
+        education: '',
+        'color-blind': '',
+        'color-blind-type': '',
+        country: '',
+        'native-language': '',
+        familiarity: ''
+    };
+}
+
+
 class VisQuiz extends Component {
 
     constructor(props) {
         super(props);
-    }
-
-    componentDidMount() {
-        this.setState({
+        this.state = {
             session_id: this.props.location.state.data.session_id,
             current_visualization_index: 0,
             score: 0,
@@ -74,21 +122,27 @@ class VisQuiz extends Component {
             resize_bool: true,
             device_info: '',
             form_incomplete: false,
-            demographic_questions: {
-                'sex': null,
-                'age': null,
-                'education': null,
-                'familiarity': null
-            },
+            demographic_questions: getInitialDemographicState(),
             demographics_incomplete: true,
             comment: '',
             width: 0,
             height: 0,
             mini_score: 0,
             ip_address: "",
+            questionStartTime: Date.now(),
+            showTimeoutOverlay: false,
         }
-        )
+    }
 
+    async componentDidMount() {
+        let ip = "";
+        try {
+            const res = await axios.get('https://api.ipify.org?format=json');
+            ip = res.data.ip || "";
+        } catch (e) {
+            ip = "";
+        }
+        this.setState({ ip_address: ip });
         window.addEventListener('resize', this.handleWindowResize.bind(this))
     }
 
@@ -101,42 +155,20 @@ class VisQuiz extends Component {
         this.setState({ comment: e.target.value })
     }
 
-    handleDemographicChange(e) {
-        console.log(this.state)
-        var new_dq = this.state.demographic_questions
-        new_dq[e.target.id] = e.target.value
-
-        var incomplete = false
-        for (var key in new_dq) {
-            if (new_dq[key] == null) {
-                incomplete = true
-            }
-        }
-        if (e.value == 'oth') {
-            alert('Hello')
-        }
-
-        this.setState({ demographic_questions: new_dq, demographics_incomplete: incomplete })
-    }
-    getData = async () => {
-        //https://medium.com/how-to-react/how-to-get-user-ip-address-in-react-js-73eb295720d0
-        const res = await axios.get('https://geolocation-db.com/json/')
-        console.log("IP Address:  ", res.data);
-        this.setState({
-            ip_address: res.data.IPv4
-        })
-    }
-
-    clicked_mini_answer(type, question, response, truth, time) {
-        this.getData()
+    clicked_mini_answer(type, question, response, truth) {
         if (response === minivis[this.state.current_mini_index]['options'][truth]) {
             this.state.mini_score = this.state.mini_score + 1
         }
+        const questionEndTime = Date.now();
+        const timeSpent = (questionEndTime - this.state.questionStartTime) / 1000;
+        // Store the correct answer text instead of index in 'truth'
+        const correctAnswerText = minivis[this.state.current_mini_index]['options'][truth];
+        this.state.mini_responses[question] = { response: response, truth: correctAnswerText, time: timeSpent };
         this.setState({
             current_mini_index: this.state.current_mini_index + 1,
+            questionStartTime: Date.now()
         })
         endTime = Math.abs((Date.now() - initTime) / 1000)
-        this.state.mini_responses[question] = { response: response, truth: truth, time: endTime }
         this.setState({
             device_info: navigator.userAgent
         })
@@ -183,9 +215,9 @@ class VisQuiz extends Component {
             method: 'POST',
             body: JSON.stringify({
                 session_id: this.state.session_id,
-                responses: this.state.responses,
+                // responses: this.state.responses, // Remove this line to only keep mini_score
                 mini_responses: this.state.mini_responses,
-                score: this.state.score,
+                // score: this.state.score, // Remove this line to only keep mini_score
                 mini_score: this.state.mini_score,
                 device: this.state.device_info,
                 demographic_responses: this.state.demographic_questions,
@@ -206,6 +238,7 @@ class VisQuiz extends Component {
             state: {
                 data: {
                     'session_id': this.state.session_id,
+                    'mini_responses': this.state.mini_responses
                 }
             }
         }
@@ -221,10 +254,51 @@ class VisQuiz extends Component {
         return Math.random();
     }
     minitimeout() {
-        alert("Time is up! Please select 'Ok' to proceed to the next question.")
+        const idx = this.state.current_mini_index;
+        const qObj = this.state.list_of_min_vis[idx];
+        // Store the correct answer text instead of index in 'truth'
+        const correctAnswerText = qObj.options[qObj.correct_answer];
+        this.state.mini_responses[qObj.question] = {
+            response: 'time-out',
+            truth: correctAnswerText,
+            time: 25
+        };
+        record_ques[qObj.type] = 'Time-Out';
         this.setState({
-            current_mini_index: this.state.current_mini_index + 1,
-        })
+            showTimeoutOverlay: true
+        });
+    }
+    onTimeOutOverlayOKClick() {
+        this.setState((prevState) => ({
+            current_mini_index: prevState.current_mini_index + 1,
+            showTimeoutOverlay: false
+        }));
+    }
+
+
+    // Add demographic form logic here
+    handleDemographicChange = (e) => {
+        const { id, value } = e.target;
+        const newDQ = { ...this.state.demographic_questions, [id]: value };
+        // If color-blind changed and is not 'yes', clear color-blind-type
+        if (id === 'color-blind' && value !== 'yes') {
+            newDQ['color-blind-type'] = '';
+        }
+        this.setState({ demographic_questions: newDQ }, this.checkDemographicsComplete);
+    }
+
+    checkDemographicsComplete = () => {
+        let incomplete = false;
+        for (let field of demographicFields) {
+            if (field.dependsOn) {
+                if (this.state.demographic_questions[field.dependsOn.field] === field.dependsOn.value && !this.state.demographic_questions[field.id]) {
+                    incomplete = true;
+                }
+            } else if (!this.state.demographic_questions[field.id]) {
+                incomplete = true;
+            }
+        }
+        this.setState({ demographics_incomplete: incomplete });
     }
 
 
@@ -282,8 +356,36 @@ class VisQuiz extends Component {
                         </Col>
                     </Row>
                     <Row className={'progress-bar-row'}>
-                        <ProgressBar completed={(parseInt(this.state.current_mini_index)).toString()} maxCompleted={num.toString()} length={Math.min(window.innerWidth, window.innerHeight)} />
+                        <ProgressBar
+                            completed={parseInt(this.state.current_mini_index)}
+                            maxCompleted={num}
+                            length={Math.min(window.innerWidth, window.innerHeight)}
+                            customLabel={`${parseInt(this.state.current_mini_index) + 1}/${num}`}
+                            labelAlignment="center"
+                        />
                     </Row>
+
+                    {this.state.showTimeoutOverlay && (
+                        <div style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            backdropFilter: 'blur(5px)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                            color: 'white',
+                            zIndex: 9999,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <p>Time is up! Please click 'OK' to proceed.</p>
+                                <Button onClick={this.onTimeOutOverlayOKClick.bind(this)}>OK</Button>
+                            </div>
+                        </div>
+                    )}
                 </Container>
             );
         }
@@ -292,88 +394,58 @@ class VisQuiz extends Component {
                 <>
                     <Row className={'justify-content-center no-margin-row'}>
                         <Col lg={6} className={'text-box text-justify'}>
-
-
-                            <Form.Group className={'question'}>
-                                <Form.Label>Please select your age.</Form.Label>
-                                <Form.Select as="select" id={'age'} onChange={this.handleDemographicChange.bind(this)}>
-                                    <option value={null} selected={true} disabled={true}></option>
-                                    {ages.map((d, i) => (
-                                        <option key={d} value={d}>{d}</option>
-                                    ))}
-                                </Form.Select>
-                            </Form.Group>
+                            {/* Demographic Form */}
+                            {demographicFields.map(field => {
+                                if (field.dependsOn && this.state.demographic_questions[field.dependsOn.field] !== field.dependsOn.value) {
+                                    return null;
+                                }
+                                if (field.type === 'select') {
+                                    return (
+                                        <Form.Group className={'question'} key={field.id}>
+                                            <Form.Label>{field.label}</Form.Label>
+                                            <Form.Select id={field.id} value={this.state.demographic_questions[field.id]} onChange={this.handleDemographicChange}>
+                                                <option value="" disabled={true}></option>
+                                                {Array.isArray(field.options)
+                                                    ? field.options.map(opt =>
+                                                        typeof opt === 'object'
+                                                            ? <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                            : <option key={opt} value={opt}>{opt}</option>
+                                                    )
+                                                    : null}
+                                            </Form.Select>
+                                        </Form.Group>
+                                    );
+                                } else if (field.type === 'text') {
+                                    // FIX: Wrap both Form.Label and Form.Control in a single Form.Group
+                                    return (
+                                        <Form.Group className={'question'} key={field.id}>
+                                            <Form.Label>{field.label}</Form.Label>
+                                            <Form.Control type="text" id={field.id} value={this.state.demographic_questions[field.id]} onChange={this.handleDemographicChange} />
+                                        </Form.Group>
+                                    );
+                                }
+                                return null;
+                            })}
                             <hr />
-
-                            <Form.Group className={'question'}>
-                                <Form.Label>Please select your gender.</Form.Label>
-                                <Form.Select as="select" id={'sex'} onChange={this.handleDemographicChange.bind(this)}>
-                                    <option value={null} selected={true} disabled={true}></option>
-                                    <option key={'male'} value={'male'}>Male</option>
-                                    <option key={'female'} value={'female'}>Female</option>
-                                    <option key={'other'} value={'other'}>Other</option>
-                                    <option key={'withdraw'} value={'withdraw'}>I do not wish to disclose.</option>
-                                </Form.Select>
-                            </Form.Group>
-                            <hr />
-
-                            <Form.Group className={'question'}>
-                                <Form.Label>Please select your highest level of completed education.</Form.Label>
-                                <Form.Select as="select" id={'education'} onChange={this.handleDemographicChange.bind(this)}>
-                                    <option value={null} selected={true} disabled={true}></option>
-                                    <option value={'highschool'}>High School Diploma / GED</option>
-                                    <option value={'associate'}>Associate Degree</option>
-                                    <option value={'bachelors'}>Bachelors Degree</option>
-                                    <option value={'masters'}>Masters Degree</option>
-                                    <option value={'doctorate'}>Doctorate Degree</option>
-                                </Form.Select>
-                            </Form.Group>
-                            <hr />
-                            <Form.Group className={'question'}>
-                                <Form.Label>Are you color-blind?</Form.Label>
-                                <Form.Select as="select" id={'color-blind'} onChange={this.handleDemographicChange.bind(this)}>
-                                    <option value={null} selected={true} disabled={true}></option>
-                                    <option value={'yes'}>Yes</option>
-                                    <option value={'no'}>No</option>
-                                    <option value={'maybe'}>I do not wish to disclose.</option>
-                                </Form.Select>
-                            </Form.Group>
-                            <hr />
-
-                            <Form.Group className={'question'}>
-                                <Form.Label>Please select your familiarity with visualization.</Form.Label>
-                                <Form.Select as="select" id={'familiarity'} onChange={this.handleDemographicChange.bind(this)}>
-                                    <option value={null} selected={true} disabled={true}></option>
-                                    <option value={'not_familiar'}>I have never created a visualization.</option>
-                                    <option value={'somewhat'}>I am somewhat familiar.</option>
-                                    <option value={'very_familiar'}>I have created visualization systems before. </option>
-                                </Form.Select>
-                            </Form.Group>
-                            <hr />
-
-
                             <Form.Group>
                                 <Form.Label>Please include any additional comments below. (optional)</Form.Label>
                                 <Form.Control as="textarea" id={'comments'} rows={3} onChange={this.handleTextChange.bind(this)}>
                                 </Form.Control>
                             </Form.Group>
                             <hr />
-
-
-                            <div className={'text-center'}><Button className={'btn-sm'}
-                                variant={"success"}
-                                onClick={this.on_survey_click.bind(this)}
-                                disabled={(this.state.form_incomplete || this.state.demographics_incomplete)}
-                                id={'survey_submit-btn'}>
-                                Submit Responses
-                            </Button></div>
-
+                            <div className={'text-center'}>
+                                <Button className={'btn-sm'}
+                                    variant={"success"}
+                                    onClick={this.on_survey_click.bind(this)}
+                                    disabled={(this.state.form_incomplete || this.state.demographics_incomplete)}
+                                    id={'survey_submit-btn'}>
+                                    Submit Responses
+                                </Button>
+                            </div>
                             <p className={'text-box'}></p>
                         </Col>
-
                     </Row>
                 </>
-
             )
         }
     }

@@ -1,226 +1,180 @@
 import React, { Component } from 'react';
-import * as d3 from 'd3'
+import * as d3 from 'd3';
 import * as topojson from 'topojson';
-import { Container, Col, Row, Navbar, Button, ButtonGroup, ToggleButton, Form, InputGroup } from 'react-bootstrap';
 import '../App.css';
 import data_usa from './data/USA.json';
 import data from './data/Choropleth.csv';
-import img8 from '../components/data/Mini-VLAT/Choropleth_New.png'
-
-
 
 class ChoroplethMini extends Component {
-
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
-        console.log(String(data_usa))
-        this.drawChart()
-    }
-    divResize(e) {
-        console.log('div was resized', e)
+        this.drawChart();
     }
 
     componentDidUpdate() {
-        this.drawChart()
+        this.drawChart();
     }
 
     drawChart() {
-        //https://www.statista.com/statistics/223675/state-unemployment-rate-in-the-us/
-        //https://bl.ocks.org/wboykinm/dbbe50d1023f90d4e241712395c27fb3
-        var e = document.getElementById("graph_box");
-        const length = Math.min(e.clientHeight, e.clientWidth)
+        // Remove previous SVG
+        d3.select("#graph_box").select("svg").remove();
 
-        const margin = { top: length / 5, right: length / 5, bottom: length / 5, left: length / 5 },
+        // Increase map size: use 99% of the smaller dimension for the map
+        var e = document.getElementById("graph_box");
+        const containerWidth = e.clientWidth || 600;
+        const containerHeight = e.clientHeight || 400;
+        const length = Math.floor(1.1 * Math.min(containerWidth, containerHeight)); // increase map size
+        const margin = { top: length / 16, right: length / 16, bottom: length / 16, left: length / 16 },
             width = length - margin.left - margin.right,
             height = length - margin.top - margin.bottom;
 
-        // append the svg object to the body of the page
-        //d3.select("#graph_box").selectAll("svg").remove();
-        d3.select("#graph_box").select("svg").remove();
+        // SVG setup
         const svg = d3.select("#graph_box")
             .append("svg")
             .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
+            .attr("height", height + margin.top + margin.bottom + 70)
+            .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom + 70}`)
+            .attr("preserveAspectRatio", "xMidYMid meet")
             .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top + 60})`);
 
-        svg.append("text").attr("class", 'bubbleTitle').text("Unemployment Rates for States in 2020").style("font-weight", 'bolder').attr('x', 1.2 * margin.top).attr('y', 0.9 * margin.top).style('font-size', 0.04 * height)
+        // Projection and path
+        var projection = d3.geoAlbersUsa()
+            .translate([width / 2, height / 2])
+            .scale(Math.min(width, height));
+        var path = d3.geoPath().projection(projection);
 
-        var image = svg.append('image').attr('width', 1.4 * width).attr('x', 0).attr('y', margin.top * height / width).attr('xlink:href', img8).attr('height', 1.1 * height)
+        // Load CSV data for unemployment values and codes
+        d3.csv(data).then(csvData => {
+            // Map state names to values and codes
+            const valueMap = {};
+            const codeMap = {};
+            csvData.forEach(d => {
+                valueMap[d.state] = +d.value;
+                codeMap[d.state] = d.code;
+            });
 
-        // else {
-        //     const margin = { top: length / 7, right: length / 7, bottom: length / 7, left: length / 7 },
-        //         width = length - margin.left - margin.right,
-        //         height = length - margin.top - margin.bottom;
+            // Get TopoJSON features
+            const usa = topojson.feature(data_usa, data_usa.objects.states).features;
 
-        //     // append the svg object to the body of the page
-        //     //d3.select("#graph_box").selectAll("svg").remove();
-        //     d3.select("#graph_box").select("svg").remove();
-        //     const svg = d3.select("#graph_box")
-        //         .append("svg")
-        //         .attr("width", width + margin.left + margin.right)
-        //         .attr("height", height + margin.top + margin.bottom)
-        //         .append("g")
-        //         .attr("transform", `translate(${margin.left},${margin.top})`);
+            // Assign value to each state
+            usa.forEach(d => {
+                d.properties.value = valueMap[d.properties.name];
+                d.properties.code = codeMap[d.properties.name];
+            });
 
-        //     // svg.append("text").attr("class", 'bubbleTitle').text("Unemployment Rates for States in 2015").style("font-weight", 'bolder').attr('x', 1.2 * margin.top).attr('y', 1.2 * margin.top).style('font-size', 0.04 * height)
+            // Color scale
+            const lowColor = '#f7fbff', highColor = '#084594';
+            const values = Object.values(valueMap);
+            const minVal = d3.min(values), maxVal = d3.max(values);
+            const ramp = d3.scaleLinear()
+                .domain([minVal, maxVal])
+                .range([lowColor, highColor]);
 
-        //     // var image = svg.append('image').attr('width', 1.4 * width).attr('x', 0).attr('y', margin.top * height / width).attr('xlink:href', img8).attr('height', 1.1 * height)
+            // --- Legend ---
+            const legendWidth = Math.max(180, width * 0.5);
+            const legendHeight = 16;
+            const legendMargin = 10;
+            const legendSvg = d3.select("#graph_box svg")
+                .append("g")
+                .attr("class", "legend")
+                .attr("transform", `translate(${margin.left + (width - legendWidth) / 2},${margin.top + 100})`); // move legend further down
 
-        //     var projection = d3.geoAlbersUsa()
-        //         .translate([width / 2, height / 2])
-        //         .scale(Math.min(e.clientHeight, e.clientWidth));
+            // Gradient
+            const defs = d3.select("#graph_box svg").append("defs");
+            const linearGradient = defs.append("linearGradient")
+                .attr("id", "legend-gradient");
+            linearGradient.selectAll("stop")
+                .data([
+                    { offset: "0%", color: lowColor },
+                    { offset: "100%", color: highColor }
+                ])
+                .enter()
+                .append("stop")
+                .attr("offset", d => d.offset)
+                .attr("stop-color", d => d.color);
 
-        //     var path = d3.geoPath()
-        //         .projection(projection)
+            legendSvg.append("rect")
+                .attr("width", legendWidth)
+                .attr("height", legendHeight)
+                .style("fill", "url(#legend-gradient)");
 
-        //     var lowColor = '#f7fbff'
-        //     var highColor = '#084594'
+            // Legend axis
+            const legendScale = d3.scaleLinear()
+                .domain([minVal, maxVal])
+                .range([0, legendWidth]);
+            const legendAxis = d3.axisBottom(legendScale)
+                .ticks(6)
+                .tickFormat(d => d + "%");
+            legendSvg.append("g")
+                .attr("transform", `translate(0,${legendHeight})`)
+                .call(legendAxis)
+                .selectAll("text")
+                .style("font-size", "12px");
 
-        //     d3.csv(data).then(function (data) {
-        //         var names = {};
-        //         data.forEach(function (d) {
-        //             d.state = d.state;
-        //             d.value = parseFloat(d.value);
-        //             names[d.id] = d.code;
-        //         })
-        //         var dataArr = [];
-        //         for (var d = 0; d < data.length; d++) {
-        //             dataArr.push(parseFloat(data[d].value))
-        //         }
-        //         var minVal = d3.min(dataArr);
-        //         var maxVal = d3.max(dataArr);
-        //         var ramp = d3.scaleLinear().domain([minVal, maxVal]).range([lowColor, highColor])
+            legendSvg.append("text")
+                .attr("x", legendWidth / 2)
+                .attr("y", -8)
+                .attr("text-anchor", "middle")
+                .style("font-size", "14px")
+                .style("font-weight", "bold")
+                .text("Unemployment Rate (%)");
 
-        //         for (var i = 0; i < data.length; i++) {
-        //             var dataState = data[i].state;
-        //             var dataVal = data[i].value;
-        //             var usa = topojson.feature(data_usa, data_usa.objects.states).features;
-        //             for (var j = 0; j < usa.length; j++) {
-        //                 var jsonState = usa[j].properties.name;
-        //                 if (dataState == jsonState) {
-        //                     usa[j].properties.value = dataVal;
-        //                     break;
-        //                 }
-        //             }
-        //         }
-        //         // Render the U.S. by using the path generator
-        //         svg.selectAll("path")
-        //             .data(usa)
-        //             .enter().append("path")
-        //             .attr("d", path)
-        //             .style("stroke", "#ffff")
-        //             .style("stroke-width", "1")
-        //             .style("fill", function (d) {
-        //                 return ramp(d.properties.value)
-        //             });
+            // Draw states
+            svg.selectAll("path")
+                .data(usa)
+                .enter().append("path")
+                .attr("d", path)
+                .style("fill", d => ramp(d.properties.value))
+                .style("stroke", d => (
+                    d.properties.name === "Washington" || d.properties.name === "Wisconsin"
+                        ? "black" : "#ccc"
+                ))
+                .style("stroke-width", d => (
+                    d.properties.name === "Washington" || d.properties.name === "Wisconsin"
+                        ? 1.5 : 1 // decrease border size
+                ));
 
-        //         svg.selectAll("text").data(usa).enter().append("text")
-        //             .text(function (d) {
-        //                 return names[d.id];
-        //             })
-        //             .attr("x", function (d) {
-        //                 return path.centroid(d)[0];
-        //             })
-        //             .attr("y", function (d) {
-        //                 return path.centroid(d)[1];
-        //             })
-        //             .attr("class", "state-abbr")
-        //             .attr("text-anchor", "middle")
-        //             .attr("fill", "black")
-        //             .style("font-weight", "bold")
+            // Add acronyms for WA and WI only, with smaller font size
+            svg.selectAll("text.state-acronym")
+                .data(usa.filter(d =>
+                    d.properties.name === "Washington" || d.properties.name === "Wisconsin"
+                ))
+                .enter()
+                .append("text")
+                .attr("class", "state-acronym")
+                .attr("x", d => path.centroid(d)[0])
+                .attr("y", d => path.centroid(d)[1])
+                .attr("text-anchor", "middle")
+                .attr("fill", "black")
+                .style("font-weight", "bold")
+                .style("font-size", `${Math.max(7, Math.floor(length * 0.018))}px`) // smaller font for acronyms
+                .text(d => d.properties.code);
 
-        //         //var w = e.clientWidth/4, h = e.clientHeight/6;
-        //         //d3.select("body").select("svg").remove();
-        //         //d3.selectAll("svg").select(".legend").remove();
-
-        //         var legend = svg.append("defs")
-        //             .append("svg:linearGradient")
-        //             .attr("id", "gradient")
-        //             .attr("x1", "0%")
-        //             .attr("y1", "100%")
-        //             .attr("x2", "100%")
-        //             .attr("y2", "100%")
-        //             .attr("spreadMethod", "pad");
-
-        //         legend.append("stop")
-        //             .attr("offset", "0%")
-        //             .attr("stop-color", highColor)
-        //             .attr("stop-opacity", 1);
-
-        //         legend.append("stop")
-        //             .attr("offset", "100%")
-        //             .attr("stop-color", lowColor)
-        //             .attr("stop-opacity", 1);
-
-        //         if (width < 350) {
-        //             svg.append("rect")
-        //                 .attr("width", length / 4)
-        //                 .attr("height", length / 5.5 - margin.top)
-        //                 .style("fill", "url(#gradient)")
-        //                 .attr("transform", "translate(0," + (length / 5.4 - margin.left / 0.8) + ")");
-
-        //             svg.append("text").attr("x", 0).attr("y", length / 8.5 - 0.4 * margin.top).text("12%").style("font-weight", "bold").attr("class", "legend-value")
-        //             svg.append("text").attr("x", length / 20).attr("y", length / 8.5 - 0.4 * margin.top).text("10%").style("font-weight", "bold").attr("class", "legend-value")
-        //             svg.append("text").attr("x", length / 10).attr("y", length / 8.5 - 0.4 * margin.top).text("8%").style("font-weight", "bold").attr("class", "legend-value")
-        //             svg.append("text").attr("x", length / 7).attr("y", length / 8.5 - 0.4 * margin.top).text("6%").style("font-weight", "bold").attr("class", "legend-value")
-        //             svg.append("text").attr("x", length / 5).attr("y", length / 8.5 - 0.4 * margin.top).text("4%").style("font-weight", "bold").attr("class", "legend-value")
-        //         }
-        //         else {
-        //             svg.append("rect")
-        //                 .attr("width", length / 4)
-        //                 .attr("height", length / 5.5 - margin.top)
-        //                 .style("fill", "url(#gradient)")
-        //                 .attr("transform", "translate(0," + (length / 5.4 - margin.left / 1) + ")");
-
-        //             svg.append("text").attr("x", 0).attr("y", length / 6.5 - 0.4 * margin.top).text("12%").style("font-weight", "bold").attr("class", "legend-value")
-        //             svg.append("text").attr("x", length / 20).attr("y", length / 6.5 - 0.4 * margin.top).text("10%").style("font-weight", "bold").attr("class", "legend-value")
-        //             svg.append("text").attr("x", length / 10).attr("y", length / 6.5 - 0.4 * margin.top).text("8%").style("font-weight", "bold").attr("class", "legend-value")
-        //             svg.append("text").attr("x", length / 7).attr("y", length / 6.5 - 0.4 * margin.top).text("6%").style("font-weight", "bold").attr("class", "legend-value")
-        //             svg.append("text").attr("x", length / 5).attr("y", length / 6.5 - 0.4 * margin.top).text("4%").style("font-weight", "bold").attr("class", "legend-value")
-        //         }
-
-
-
-
-
-        //         /*
-        //         var y = d3.scaleLinear()
-        //             .range([length/4 - length/3.3, length/4.4 - length/(margin.left/4.0)])
-        //             //.domain([maxVal, minVal]);
-        //         //ar formatPercent = d3.format("%");
-        //         var yAxis = d3.axisBottom(y).tickValues(["12%", "11%", "10%", "9%"]);
-        //         svg.append("g")
-        //             //.attr("class", "axis")
-        //             .attr("transform", "translate(" + (length/5.45-margin.left/1.1) + "," + margin.right/0.75 + ")")
-        //             .call(yAxis)
-        //             .style("font-weight", "bold")
-        //             .style("font-size", 1.3*(length/margin.top)); */
-
-        //         svg
-        //             .append("text")
-        //             .attr("x", width / 5.5)
-        //             .attr("y", -length / margin.top)    // +20 to adjust position (lower)
-        //             .text("Unemployment Rate for States in 2020 ")
-        //             .attr("class", "title")
-        //             .attr("fill", "black")
-        //             .style("font-weight", "bold")
-
-        //     });
-
-        // }
-
-
+            // Title: decrease font size
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", -margin.top / 2)
+                .attr("text-anchor", "middle")
+                .style("font-weight", "bold")
+                .style("font-size", 0.035 * height) // smaller title
+                .text("Unemployment Rates for States in 2020");
+        });
     }
 
-
     render() {
-
+        // Make the container responsive
         return (
-            <div id={'graph_box'}>
-            </div>
+            <div
+                id={'graph_box'}
+                style={{
+                    width: "100%",
+                    height: "min(70vw, 70vh)",
+                    minHeight: "350px",
+                    minWidth: "350px",
+                    maxWidth: "1100px",
+                    margin: "auto"
+                }}
+            ></div>
         );
     }
 }

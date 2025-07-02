@@ -1,7 +1,5 @@
 import React, { Component, useState, useEffect } from 'react';
 import { Col, Row, Navbar, Button } from 'react-bootstrap';
-import { PDFViewer } from '@react-pdf/renderer';
-import { Document, Page } from 'react-pdf';
 
 class Intro extends Component {
 
@@ -59,7 +57,7 @@ class Intro extends Component {
               {/* <p>Approximately 5100 people will take part in this study at Washington University.</p> */}
               <p>There are no known risks from being in this study.</p>
               <p>You will not benefit personally.  However, we hope that others may benefit in the future from what we learn as a result of this study. You will not have any costs for being in this research study.</p>
-              <p>You will be paid for being in this research study. You will receive a pay of $8 for completing this quiz. At the end of the study, copy your survey code back to Prolific to receive your payment.</p>
+              {/* <p>You will be paid for being in this research study. You will receive a pay of $8 for completing this quiz. At the end of the study, copy your survey code back to Prolific to receive your payment.</p> */}
               <p>We will keep the information you provide confidentially. This survey is completely anonymous; we will not collect any personally identifiable information. We will only have access to your Prolific ID only, which we will use solely for payment purposes. </p>
               <p>Any report or article that we write will not include information that can directly identify you.  The journals that publish these reports or articles require that we share the information that was collected for this study with others to make sure the results of this study are correct and help develop new ideas for research. Your information will be shared in a way that cannot directly identify you.</p>
               <p>Federal regulatory agencies and Washington University, including the Washington University Institutional Review Board (a committee that reviews and approves research studies) and the Human Research Protection Office, may inspect and copy records pertaining to this research.

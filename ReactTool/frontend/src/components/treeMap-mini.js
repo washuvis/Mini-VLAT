@@ -84,8 +84,8 @@ class TreeMapMini extends Component {
 
             // prepare a color scale
             const color = d3.scaleOrdinal()
-                .domain(["boss1", "boss2", "boss3", "boss4", "boss5"])
-                .range(['#7fc97f', '#beaed4', '#fdc086', '#fb9a99', '#386cb0'])
+                .domain(["Search/Portal", "Software", "Social Network", "Computer"])
+                .range(['#337438', '#c26879', '#a14b96', '#94cbed']);
 
             // And a opacity scale
             const opacity = d3.scaleLinear()

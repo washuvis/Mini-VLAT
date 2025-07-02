@@ -29,7 +29,7 @@ class StackedBarChartMini extends Component {
         //https://olympics.com/en/olympic-games/tokyo-2020/medals
         //https://www.d3-graph-gallery.com/graph/barplot_stacked_percent.html
         var e = document.getElementById("graph_box");
-        const length = Math.min(e.clientHeight, e.clientWidth)
+        const length = Math.min(e.clientHeight, e.clientWidth) * 0.8; // Decrease plot size a bit more
         if (length < 570) {
             const margin = { top: length / 7, right: length / 9, bottom: length / 7, left: length / 9 },
                 width = length - margin.left - margin.right,
@@ -79,15 +79,18 @@ class StackedBarChartMini extends Component {
                 svg.append("g")
                     .attr("class", "x-axis")
                     .attr("transform", `translate(0, ${height})`)
-                    .call(d3.axisBottom(xScale).tickSizeOuter(0));
+                    .call(d3.axisBottom(xScale).tickSizeOuter(0))
+                    .selectAll("text")
+                    .style("font-size", "1.5em"); // Increase x-axis label size
 
                 var yScale = d3.scaleLinear().domain([0, 100]).range([height, 0]);
 
-                svg.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale));
+                svg.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale)).selectAll("text")
+                    .style("font-size", "1.5em"); // Increase y-axis label size
 
                 const color = d3.scaleOrdinal()
                     .domain(subgroups)
-                    .range(['#feb24c', '#bdbdbd', '#cd7f32'])
+                    .range(['#ecbf32', '#afb3b8', '#cc7e32']); // Gold, Silver, Bronze
 
                 //stack the data? --> stack per subgroup
                 const stackedData = d3.stack()
@@ -154,6 +157,7 @@ class StackedBarChartMini extends Component {
                     .style("text-anchor", "middle")
                     .text("Olympic Medals (%)")
                     .style("font-weight", "bold")
+                    .style("font-size", `${Math.max(12, Math.floor(length * 0.030))}px`);
 
                 svg.append("text")
                     .attr("class", "x-label")
@@ -167,206 +171,52 @@ class StackedBarChartMini extends Component {
                     })
                     .style("text-anchor", "middle")
                     .style("font-weight", "bold")
+                    .style("font-size", `${Math.max(12, Math.floor(length * 0.030))}px`)
                     .text("Countries")
-
-                //var legend = svg.append('g').attr('class', 'legend').attr('transform', 'translate(' + (margin.left/2) + ',0)');
-
-                svg.append("rect")
-                    .attr("x", function () {
-                        if (width < 400) {
-                            return width + (width / margin.left)
-                        }
-                        else {
-                            return width + (2 * width / margin.left)
-                        }
-                    })
-                    .attr("y", height / margin.bottom)
-                    .attr("width", function () {
-                        if (window.innerWidth < 450 && window.innerWidth > 400) {
-                            return 2.0 * length / margin.bottom;
-                        }
-                        else if (window.innerWidth < 400) {
-                            return 1.0 * length / margin.bottom;
-                        }
-                        else {
-                            return 2.5 * length / margin.bottom
-                        }
-                    })
-                    .attr("height", function () {
-                        if (window.innerWidth < 450 && window.innerWidth > 400) {
-                            return 2.0 * length / margin.bottom;
-                        }
-                        else if (window.innerWidth < 400) {
-                            return 1.0 * length / margin.bottom;
-                        }
-                        else {
-                            return 2.5 * length / margin.bottom
-                        }
-                    })
-                    .attr("fill", "#cd7f32")
-
-                svg.append("rect")
-                    .attr("x", function () {
-                        if (width < 400) {
-                            return width + (width / margin.left)
-                        }
-                        else {
-                            return width + (2 * width / margin.left)
-                        }
-                    })
-                    .attr("y", (5.4) * height / margin.bottom)
-                    .attr("width", function () {
-                        if (window.innerWidth < 450 && window.innerWidth > 400) {
-                            return 2.0 * length / margin.bottom;
-                        }
-                        else if (window.innerWidth < 400) {
-                            return 1.0 * length / margin.bottom;
-                        }
-                        else {
-                            return 2.5 * length / margin.bottom
-                        }
-                    })
-                    .attr("height", function () {
-                        if (window.innerWidth < 450 && window.innerWidth > 400) {
-                            return 2.0 * length / margin.bottom;
-                        }
-                        else if (window.innerWidth < 400) {
-                            return 1.0 * length / margin.bottom;
-                        }
-                        else {
-                            return 2.5 * length / margin.bottom
-                        }
-                    })
-                    .attr("fill", "#bdbdbd")
-
-                svg.append("rect")
-                    .attr("x", function () {
-                        if (width < 400) {
-                            return width + (width / margin.left)
-                        }
-                        else {
-                            return width + (2 * width / margin.left)
-                        }
-                    })
-                    .attr("y", (10.0) * height / margin.bottom)
-                    .attr("width", function () {
-                        if (window.innerWidth < 450 && window.innerWidth > 400) {
-                            return 2.0 * length / margin.bottom;
-                        }
-                        else if (window.innerWidth < 400) {
-                            return 1.0 * length / margin.bottom;
-                        }
-                        else {
-                            return 2.5 * length / margin.bottom
-                        }
-                    })
-                    .attr("height", function () {
-                        if (window.innerWidth < 450 && window.innerWidth > 400) {
-                            return 2.0 * length / margin.bottom;
-                        }
-                        else if (window.innerWidth < 400) {
-                            return 1.0 * length / margin.bottom;
-                        }
-                        else {
-                            return 2.5 * length / margin.bottom
-                        }
-                    })
-                    .attr("fill", "#feb24c")
-
-                svg.append("text")
-                    .text("Bronze")
-                    .attr("x", function () {
-                        if (width < 500 && width > 400) {
-                            return width + (5.5 * width / margin.left)
-                        }
-                        else if (width < 400) {
-                            return width + (2.5 * width / margin.left)
-                        }
-                        else {
-                            return width + (6 * width / margin.left)
-                        }
-                    })
-                    .attr("y", function () {
-                        if (width < 500 && width > 400) {
-                            return height / margin.bottom + 1.5 * length / margin.bottom
-                        }
-                        else if (width < 400) {
-                            return height / margin.bottom + 0.8 * length / margin.bottom
-                        }
-                        else {
-                            return height / margin.bottom + 2.0 * length / margin.bottom
-                        }
-                    })
-                    .attr("class", "legend-value")
-
-                svg.append("text")
-                    .text("Silver")
-                    .attr("x", function () {
-                        if (width < 500 && width > 400) {
-                            return width + (5.5 * width / margin.left)
-                        }
-                        else if (width < 400) {
-                            return width + (2.5 * width / margin.left)
-                        }
-                        else {
-                            return width + (6 * width / margin.left)
-                        }
-                    })
-                    .attr("y", function () {
-                        if (width < 500 && width > 400) {
-                            return (5.4) * height / margin.bottom + 1.5 * length / margin.bottom
-                        }
-                        else if (width < 400) {
-                            return (5.4) * height / margin.bottom + 0.8 * length / margin.bottom
-                        }
-                        else {
-                            return (5.4) * height / margin.bottom + 2.0 * length / margin.bottom
-                        }
-                    })
-                    .attr("class", "legend-value")
-
-                svg.append("text")
-                    .text("Gold")
-                    .attr("x", function () {
-                        if (width < 500 && width > 400) {
-                            return width + (5.5 * width / margin.left)
-                        }
-                        else if (width < 400) {
-                            return width + (2.5 * width / margin.left)
-                        }
-                        else {
-                            return width + (6 * width / margin.left)
-                        }
-                    })
-                    .attr("y", function () {
-                        if (width < 500 && width > 400) {
-                            return (10.0) * height / margin.bottom + 1.5 * length / margin.bottom;
-                        }
-                        else if (width < 400) {
-                            return (10.0) * height / margin.bottom + 0.8 * length / margin.bottom;
-                        }
-                        else {
-                            return (10.0) * height / margin.bottom + 2.0 * length / margin.bottom
-                        }
-                    })
-                    .attr("class", "legend-value")
 
                 svg
                     .append("text")
                     .attr("class", "title")
-                    .attr("x", function () {
-                        if (width < 400) {
-                            return width / 19
-                        }
-                        else {
-                            return width / 6
-                        }
-                    })
-                    .attr("y", -length / margin.top)    // +20 to adjust position (lower)
+                    .attr("x", width / 2)
+                    .attr("y", -margin.top / 2)
+                    .attr("text-anchor", "middle")
                     .text("Tokyo 2020 Olympics Performance Summary")
                     .attr("fill", "black")
                     .style("font-weight", "bold")
+                    .style("font-size", `${Math.max(14, Math.floor(length * 0.045))}px`); // Decrease title size
 
+                // Legend on right, vertical
+                const legendItems = [
+                    { label: "Gold", color: "#ecbf32" },
+                    { label: "Silver", color: "#afb3b8" },
+                    { label: "Bronze", color: "#cc7e32" }
+                ];
+                const legendRectSize = Math.max(12, Math.floor(length * 0.025));
+                const legendSpacing = Math.max(22, Math.floor(length * 0.045));
+                const legendX = width + margin.right / 2;
+                const legendY = 10;
+
+                const legend = svg.append("g")
+                    .attr("class", "legend")
+                    .attr("transform", `translate(${legendX},${legendY})`);
+
+                legendItems.forEach((item, i) => {
+                    legend.append("rect")
+                        .attr("x", -25)
+                        .attr("y", i * legendSpacing)
+                        .attr("width", legendRectSize)
+                        .attr("height", legendRectSize)
+                        .attr("fill", item.color);
+
+                    legend.append("text")
+                        .attr("x", -10)
+                        .attr("y", i * legendSpacing + legendRectSize * 0.8)
+                        .attr("class", "legend-value")
+                        .style("font-size", `${Math.max(8, Math.floor(length * 0.025))}px`) // Decrease legend label size
+                        .style("font-weight", "bold")
+                        .style("fill", item.color)
+                        .text(item.label);
+                });
             })
         }
 

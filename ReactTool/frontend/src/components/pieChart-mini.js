@@ -63,7 +63,8 @@ class PieChartMini extends Component {
             var data = { Samsung: 17.6, Xiaomi: 15.5, Apple: 15.0, Oppo: 10.2, Vivo: 9.8, Others: 31.9 }
 
             const color = d3.scaleOrdinal()
-                .range(['#0868ac', '#f03b20', '#feb24c', '#78c679', '#ffffb2', '#756bb1'])
+                .domain(["Samsung", "Xiaomi", "Apple", "Oppo", "Vivo", "Others"])
+                .range(['#009e72', '#0072b2', '#56b5e8', '#efe542', '#d45f00', '#cc78a6'])
 
             const pie = d3.pie()
                 .value(function (d) {
