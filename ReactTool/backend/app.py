@@ -4,18 +4,15 @@ import time
 import os
 from flask import Flask, request, jsonify
 from flask.globals import session
-#from flaskext.mysql import MySQL
 import json
 import random
 import datetime
 import secrets
-#import numpy as np
 import pandas as pd
 import db_conf
 from flask import send_file
-#from flask_mail import Mail, Message
-#import firebase_admin
-#from firebase_admin import credentials, firestore, initialize_app, firebase
+import firebase_admin
+from firebase_admin import credentials, firestore
 
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 app.config['MYSQL_DATABASE_HOST'] = db_conf.host
@@ -23,24 +20,16 @@ app.config['MYSQL_DATABASE_USER'] = db_conf.user
 app.config['MYSQL_DATABASE_PASSWORD'] = db_conf.password
 app.config['MYSQL_DATABASE_DB'] = db_conf.db
 db_table_prefix = 'miniVlat'
-#mail = Mail(app)
 
-# app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-# app.config['MAIL_PORT'] = 465
-# app.config['MAIL_USERNAME'] = 'minivlat@gmail.com'
-# app.config['MAIL_PASSWORD'] = "minivlat123"
-# app.config['MAIL_USE_TLS'] = False
-# app.config['MAIL_USE_SSL'] = True
-#mail = Mail(app)
 
-#mysql = MySQL()
-# mysql.init_app(app)
 
 global_session = {}
 
-#cred = credentials.Certificate("securekey.json")
-#default_app = initialize_app(cred)
-#db = firestore.client()
+# Initialize Firebase only once
+if not firebase_admin._apps:
+    cred = credentials.Certificate("serviceAccountKey.json")  # Path to your key
+    firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 if __name__ == '__main__':
     app.run(debug=True)
@@ -94,44 +83,20 @@ def get_new_session_id():
 def record_responses_to_db():
     data = request.json
     session_id = data['session_id']
-    #fname = str(session_id)+'.txt'
-    #fname = './surveys/quiz/' + fname
-    # with open(fname, 'w+') as test:
-    #    test.write(json.dumps(data) + "\n")
-    #res = firebase.post(data_send)
-    # data_send = json.dumps(data)
-    # msg = Message("Quiz Response for " + str(session_id),sender='minivlat@gmail.com', recipients=['minivlat@gmail.com'])
-    # msg.body = data_send
-    # mail.send(msg)
-    fname = str(session_id)+'.txt'
+
+    # Always save to txt file
+    fname = str(session_id) + '.txt'
     fname = './surveys/quiz/' + fname
     with open(fname, 'w+') as test:
         test.write(json.dumps(data) + "\n")
 
-    print('TODO: Record quiz responses into a file or DB')
-    print('Collected quiz data: ', data)
-    return {'response': "json post succeeded"}
+    # Also try to save to Firestore
+    try:
+        db.collection('quiz_responses').document(session_id).set(data)
+        print('Stored quiz data in Firestore:', data)
+        firebase_status = "Firebase post succeeded"
+    except Exception as e:
+        print('Failed to store in Firestore:', e)
+        firebase_status = f"Firebase post failed: {e}"
 
-
-# @app.route('/record_survey_to_db', methods=['POST'])
-# def record_survey_to_db():
-#     data = request.json
-#     session_id = data['session_id']
-
-#     #fname = str(session_id)+'.txt'
-#     #fname = './surveys/demographicResponses/' + fname
-#     # with open(fname, 'w+') as test2:
-#     #    test2.write(json.dumps(data) + "\n")
-#     #res = firebase.post(data_send)
-#     # data_send = json.dumps(data)
-#     # msg = Message("Demographic Response for " + str(session_id),sender='minivlat@gmail.com', recipients=['minivlat@gmail.com'])
-#     # msg.body = data_send
-#     # mail.send(msg)
-#     fname = str(session_id) + '.txt'
-#     fname = './surveys/demographicResponses/' + fname
-#     with open(fname, 'w+') as test2:
-#         test2.write(json.dumps(data) + "\n")
-
-#     print('TODO: Record survey responses into a file or DB')
-#     print('Collected survey data: ', data)
-#     return {'response': "json post succeeded"}
+    return {'response': f"txt file saved; {firebase_status}"}
